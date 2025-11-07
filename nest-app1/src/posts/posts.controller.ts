@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostInterface } from './Interfaces/post.interface';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -31,14 +33,14 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createData: Omit<PostInterface, 'id' | 'createdAt'>) {
+  create(@Body() createData: CreatePostDto) {
     return this.postService.create(createData);
   }
 
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateData: Partial<Omit<PostInterface, 'id' | 'createdAt'>>,
+    @Body() updateData: UpdatePostDto,
   ) {
     return this.postService.update(id, updateData);
   }
