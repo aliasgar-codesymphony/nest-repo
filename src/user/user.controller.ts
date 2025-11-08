@@ -17,6 +17,23 @@ import { updateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get()
+  getUsers() {
+    return this.userService.getUsers();
+  }
+
+  @Get(':id')
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.userService.getUserById(id);
+    if (!user) {
+      console.log(user);
+      return { message: 'User Not Exists' };
+    } else {
+      console.log(user);
+      return user;
+    }
+  }
+
   @Post()
   async createUser(@Body() userData: CreateUserDto) {
     const exists = await this.userService.createUser(userData);
@@ -25,11 +42,6 @@ export class UserController {
     } else {
       return { message: 'User created successfully' };
     }
-  }
-
-  @Get()
-  getUsers() {
-    return this.userService.getUsers();
   }
 
   @Put(':id')

@@ -12,6 +12,14 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  getUsers() {
+    return this.userRepository.find();
+  }
+
+  getUserById(id: number) {
+    return this.userRepository.findOne({ where: { id } });
+  }
+
   async createUser(userData: UserInterface) {
     const fullname = userData.fullname;
     const email = userData.email;
@@ -31,10 +39,6 @@ export class UserService {
       console.log(exists);
       return exists;
     }
-  }
-
-  getUsers() {
-    return this.userRepository.find();
   }
 
   async updateUser(id: number, updateUser: Partial<UserInterface>) {
