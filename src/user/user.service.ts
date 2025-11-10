@@ -4,12 +4,18 @@ import { UserInterface } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
 import { Repository } from 'typeorm';
+import { Personal_Details } from 'src/typeorm/entities/Personal_Details';
+import { Employment_Details } from 'src/typeorm/entities/Employment_Details';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly helloService: HelloService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Personal_Details)
+    private personalRepository: Repository<Personal_Details>,
+    @InjectRepository(Employment_Details)
+    private employeeRepository: Repository<Employment_Details>,
   ) {}
 
   getUsers() {
@@ -17,10 +23,66 @@ export class UserService {
   }
 
   getUserById(id: number) {
-    return this.userRepository.findOne({ where: { id } });
+    return this.userRepository.findOneBy({ id });
   }
 
   async createUser(userData: UserInterface) {
+    const fullname = userData.fullname;
+    const email = userData.email;
+    const exists = await this.userRepository.exists({
+      where: { fullname, email },
+    });
+
+    if (!exists) {
+      console.log(exists);
+
+      const {
+        fullname,
+        email,
+        password,
+        gender,
+        age,
+        phone,
+        address,
+        designation,
+        salary,
+        joindate,
+        department,
+      } = userData;
+
+      const newUser = this.userRepository.create({
+        fullname,
+        email,
+        password,
+      });
+      await this.userRepository.save(newUser);
+
+      const personal = this.personalRepository.create({
+        gender,
+        age,
+        phone,
+        address,
+        userId: newUser,
+      });
+      await this.personalRepository.save(personal);
+
+      const employee = this.employeeRepository.create({
+        designation,
+        salary,
+        joindate,
+        department,
+        userId: newUser,
+      });
+      await this.employeeRepository.save(employee);
+
+      return exists;
+    } else {
+      console.log(exists);
+      return exists;
+    }
+  }
+
+  /* async createUser(userData: UserInterface) {
     const fullname = userData.fullname;
     const email = userData.email;
     const exists = await this.userRepository.exists({
@@ -39,7 +101,7 @@ export class UserService {
       console.log(exists);
       return exists;
     }
-  }
+  } */
 
   async updateUser(id: number, updateUser: Partial<UserInterface>) {
     const exists = await this.userRepository.exists({

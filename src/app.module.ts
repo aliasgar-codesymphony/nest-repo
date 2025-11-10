@@ -7,6 +7,8 @@ import { UserModule } from './user/user.module';
 import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './typeorm/entities/User';
+import { Personal_Details } from './typeorm/entities/Personal_Details';
+import { Employment_Details } from './typeorm/entities/Employment_Details';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { User } from './typeorm/entities/User';
       username: 'root',
       password: '',
       database: 'nest_mysql',
-      entities: [User],
+      entities: [User, Personal_Details,Employment_Details],
       synchronize: true,
     }),
   ],
