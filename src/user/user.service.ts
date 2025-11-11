@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { HelloService } from 'src/hello/hello.service';
 import { UserInterface } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
-import { Repository } from 'typeorm';
+import { Or, Repository } from 'typeorm';
 import { Personal_Details } from 'src/typeorm/entities/Personal_Details';
 import { Employment_Details } from 'src/typeorm/entities/Employment_Details';
 
@@ -24,6 +29,14 @@ export class UserService {
 
   getUserById(id: number) {
     return this.userRepository.findOneBy({ id });
+  }
+
+  getPersonalById(user: {}) {
+    return this.personalRepository.findOneBy({ userId: user });
+  }
+
+  getEmployeeById(user: {}) {
+    return this.employeeRepository.findOneBy({ userId: user });
   }
 
   async createUser(userData: UserInterface) {
@@ -109,8 +122,42 @@ export class UserService {
     });
 
     if (exists == true) {
-      console.log(exists);
-      await this.userRepository.update({ id }, { ...updateUser });
+      //console.log(exists);
+      const user = await this.getUserById(id);
+
+      const userData = {
+        fullname: updateUser.fullname ?? user?.fullname,
+        email: updateUser.email ?? user?.email,
+        password: updateUser.password ?? user?.password,
+      };
+      await this.userRepository.update({ id }, { ...userData });
+
+      const personal = await this.getPersonalById({ ...user });
+
+      const personalData = {
+        gender: updateUser.gender ?? personal?.gender,
+        age: updateUser.age ?? personal?.age,
+        phone: updateUser.phone ?? personal?.phone,
+        address: updateUser.address ?? personal?.address,
+      };
+      console.log(personalData);
+      await this.personalRepository.update(
+        { userId: { ...user } },
+        { ...personalData },
+      );
+
+      const employee = await this.getEmployeeById({ ...user });
+
+      const employeeData = {
+        designation: updateUser.designation ?? employee?.designation,
+        salary: updateUser.salary ?? employee?.salary,
+        joindate: updateUser.joindate ?? employee?.joindate,
+        department: updateUser.department ?? employee?.department,
+      };
+      await this.employeeRepository.update(
+        { userId: { ...user } },
+        { ...employeeData },
+      );
 
       return exists;
     } else {
@@ -124,7 +171,11 @@ export class UserService {
       where: { id },
     });
     if (exists == true) {
+      const user = await this.getUserById(id);
       console.log(exists);
+
+      await this.personalRepository.delete({ userId: { ...user } });
+      await this.employeeRepository.delete({ userId: { ...user } });
       await this.userRepository.delete({ id });
       return exists;
     } else {

@@ -26,11 +26,16 @@ export class UserController {
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.getUserById(id);
     if (!user) {
-      console.log(user);
+      //console.log(user);
       return { message: 'User Not Exists' };
     } else {
       console.log(user);
-      return user;
+      const personal = await this.userService.getPersonalById(user);
+      console.log(personal);
+      const employee = await this.userService.getEmployeeById(user);
+      console.log(employee);
+      //return { ...user, ...personal, ...employee };
+      return { user, personal, employee };
     }
   }
 
