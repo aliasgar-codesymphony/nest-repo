@@ -22,6 +22,11 @@ export class UserController {
     return this.userService.getUsers();
   }
 
+  @Get(':email')
+  getUserByEmail(@Param('email') email: string) {
+    return this.userService.getUserByEmail(email);
+  }
+
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.getUserById(id);
