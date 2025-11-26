@@ -26,6 +26,7 @@ export class CreateUserDto {
   @MaxLength(20, { message: 'password should not more than 20 characters' })
   password: string;
 
+  /* // personal details
   @IsNotEmpty({ message: 'gender should not empty' })
   @IsString({ message: 'gender must be a string' })
   @IsIn(['male', 'female'], { message: 'gender should male or female' })
@@ -60,5 +61,5 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'department should not empty' })
   @IsString({ message: 'department must be a string' })
-  department: string;
+  department: string; */
 }

@@ -12,7 +12,9 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { updateUserDto } from './dto/update-user.dto';
+import { Public } from 'src/auth/roles.decorator';
 
+@Public()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -27,7 +29,7 @@ export class UserController {
     return this.userService.getUserByEmail(email);
   }
 
-  @Get(':id')
+  /* @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.getUserById(id);
     if (!user) {
@@ -42,6 +44,16 @@ export class UserController {
       //return { ...user, ...personal, ...employee };
       return { user, personal, employee };
     }
+  } */
+
+  @Get('compare/:id/:pass')
+  comparePass(@Param('id', ParseIntPipe) id: number,@Param('pass') pass:string){
+    return this.userService.comparePass(id,pass)
+  }
+
+  @Get('id/:id')
+  getUserById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getUserById(id);
   }
 
   @Post()
